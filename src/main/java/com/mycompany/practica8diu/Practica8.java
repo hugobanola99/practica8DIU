@@ -5,8 +5,15 @@
  */
 package com.mycompany.practica8diu;
 
+import java.awt.Dimension;
 import java.awt.Point;
+import java.io.File;
+import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.JFileChooser;
 import javax.swing.JInternalFrame;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 /**
  *
@@ -14,11 +21,15 @@ import javax.swing.JInternalFrame;
  */
 public class Practica8 extends javax.swing.JFrame {
 
-    /**
-     * Creates new form Practica8
-     */
+    JFileChooser fc = new JFileChooser();
+    FileNameExtensionFilter filtro = null;
+    File fichero;
+    
     public Practica8() {
         initComponents();
+        filtro = new FileNameExtensionFilter("Imagenes","jpg","jpeg","png");
+        fc.addChoosableFileFilter(filtro);
+        escritorio.setSize(new Dimension(this.getHeight(),this.getWidth()));
     }
 
     /**
@@ -33,6 +44,7 @@ public class Practica8 extends javax.swing.JFrame {
         escritorio = new javax.swing.JDesktopPane();
         jMenuBar1 = new javax.swing.JMenuBar();
         jMenu1 = new javax.swing.JMenu();
+        abrir = new javax.swing.JMenuItem();
         jMenu2 = new javax.swing.JMenu();
         abrirVentanaInterna = new javax.swing.JMenuItem();
         cerrarVentana = new javax.swing.JMenuItem();
@@ -43,14 +55,23 @@ public class Practica8 extends javax.swing.JFrame {
         escritorio.setLayout(escritorioLayout);
         escritorioLayout.setHorizontalGroup(
             escritorioLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 474, Short.MAX_VALUE)
+            .addGap(0, 631, Short.MAX_VALUE)
         );
         escritorioLayout.setVerticalGroup(
             escritorioLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 345, Short.MAX_VALUE)
+            .addGap(0, 435, Short.MAX_VALUE)
         );
 
         jMenu1.setText("Fichero");
+
+        abrir.setText("Abrir");
+        abrir.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                abrirActionPerformed(evt);
+            }
+        });
+        jMenu1.add(abrir);
+
         jMenuBar1.add(jMenu1);
 
         jMenu2.setText("Edición");
@@ -105,6 +126,29 @@ public class Practica8 extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_cerrarVentanaActionPerformed
 
+    private void abrirActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_abrirActionPerformed
+        // TODO add your handling code here:
+        int res = fc.showOpenDialog(null);
+        if(res == JFileChooser.APPROVE_OPTION){
+            fichero = fc.getSelectedFile();
+            System.out.println("Fichero: "+fichero.getAbsolutePath());
+            VentanaInterna ventana = new VentanaInterna();
+            escritorio.add(ventana);
+            ventana.setLocation(new Point(30,20));
+            ventana.setVisible(true);
+            try {
+                
+                ventana.lienzo1.setImagen(fichero.getAbsolutePath());
+                repaint();
+            } catch (IOException ex) {
+                Logger.getLogger(Practica8.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            
+        }else if(res == JFileChooser.CANCEL_OPTION){
+            System.out.println("Cancelar");
+        }
+    }//GEN-LAST:event_abrirActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -141,6 +185,7 @@ public class Practica8 extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JMenuItem abrir;
     private javax.swing.JMenuItem abrirVentanaInterna;
     private javax.swing.JMenuItem cerrarVentana;
     private javax.swing.JDesktopPane escritorio;
