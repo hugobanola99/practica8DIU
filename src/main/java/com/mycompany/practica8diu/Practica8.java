@@ -7,13 +7,22 @@ package com.mycompany.practica8diu;
 
 import java.awt.Dimension;
 import java.awt.Point;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JFileChooser;
+import javax.swing.JFrame;
 import javax.swing.JInternalFrame;
+import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileNameExtensionFilter;
+import org.opencv.core.Core;
+import org.opencv.core.CvType;
+import org.opencv.core.Mat;
+import org.opencv.highgui.HighGui;
+import org.opencv.imgcodecs.Imgcodecs;
+import org.opencv.imgproc.Imgproc;
 
 /**
  *
@@ -24,12 +33,26 @@ public class Practica8 extends javax.swing.JFrame {
     JFileChooser fc = new JFileChooser();
     FileNameExtensionFilter filtro = null;
     File fichero;
+    int dato;
+    Mat img;
     
     public Practica8() {
         initComponents();
         filtro = new FileNameExtensionFilter("Imagenes","jpg","jpeg","png");
         fc.addChoosableFileFilter(filtro);
         escritorio.setSize(new Dimension(this.getHeight(),this.getWidth()));
+        nu.pattern.OpenCV.loadShared();
+        System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
+        this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+        addWindowListener(new java.awt.event.WindowAdapter() {
+            @Override
+            public void windowClosing(java.awt.event.WindowEvent evt) {
+                if (JOptionPane.showConfirmDialog(rootPane, "¿Desea realmente salir del sistema?",
+                "Salir del sistema", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION)
+                    System.exit(0);
+            }                
+           
+        });
     }
 
     /**
@@ -46,7 +69,7 @@ public class Practica8 extends javax.swing.JFrame {
         jMenu1 = new javax.swing.JMenu();
         abrir = new javax.swing.JMenuItem();
         jMenu2 = new javax.swing.JMenu();
-        abrirVentanaInterna = new javax.swing.JMenuItem();
+        Umbralizar = new javax.swing.JMenuItem();
         cerrarVentana = new javax.swing.JMenuItem();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
@@ -76,13 +99,13 @@ public class Practica8 extends javax.swing.JFrame {
 
         jMenu2.setText("Edición");
 
-        abrirVentanaInterna.setText("Abrir Ventana Interna");
-        abrirVentanaInterna.addActionListener(new java.awt.event.ActionListener() {
+        Umbralizar.setText("Umbralizar");
+        Umbralizar.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                abrirVentanaInternaActionPerformed(evt);
+                UmbralizarActionPerformed(evt);
             }
         });
-        jMenu2.add(abrirVentanaInterna);
+        jMenu2.add(Umbralizar);
 
         cerrarVentana.setText("Cerrar Ventanas");
         cerrarVentana.addActionListener(new java.awt.event.ActionListener() {
@@ -110,14 +133,46 @@ public class Practica8 extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void abrirVentanaInternaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_abrirVentanaInternaActionPerformed
+    private void UmbralizarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_UmbralizarActionPerformed
         // TODO add your handling code here:
+        if(fichero != null){
+            String in = JOptionPane.showInputDialog(rootPane,"Introduzca un valor para el umbralizado","Umbralizado",JOptionPane.DEFAULT_OPTION);
+            if(isNumeric(in)){
+                dato = Integer.parseInt(in);
+                System.out.println(fc.getSelectedFile().getAbsolutePath());
+                Mat m = Imgcodecs.imread(fc.getSelectedFile().getAbsolutePath());
+                img = umbralizar(m,dato);
+                BufferedImage i = (BufferedImage) HighGui.toBufferedImage(img);
+                VentanaInterna ventana = new VentanaInterna();
+                ventana.setTitle(fichero.getName());
+                
+                escritorio.add(ventana);
+                ventana.setLocation(new Point(50,75));
+                ventana.setVisible(true);
+                ventana.lienzo1.setImagen(i);
+                ventana.setSize(new Dimension(ventana.lienzo1.imageWidth(),ventana.lienzo1.imageHeight()));
+                this.setBounds(20, 30, this.getWidth()+25, this.getHeight()+25);
+                repaint();
+                JOptionPane.showMessageDialog(rootPane, "Proceso umbralizado concluido", "Proceso Umbralizado", JOptionPane.INFORMATION_MESSAGE);
+            }else{
+                JOptionPane.showMessageDialog(rootPane, "Debes introducir un numero entero", "Valor erroneo", JOptionPane.ERROR_MESSAGE);
+            }
+            
+        }else{
+            JOptionPane.showMessageDialog(rootPane, "Debes abrir un fichero previamente", "Error umbralizar", JOptionPane.ERROR_MESSAGE);
+        }
+    
+        
+        /*
         VentanaInterna ventana = new VentanaInterna();
         escritorio.add(ventana);
         ventana.setLocation(new Point(30,20));
         ventana.setVisible(true);
-    }//GEN-LAST:event_abrirVentanaInternaActionPerformed
+        */
+    }//GEN-LAST:event_UmbralizarActionPerformed
 
+    
+    
     private void cerrarVentanaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cerrarVentanaActionPerformed
         // TODO add your handling code here:
         JInternalFrame[] vectorVentanas = escritorio.getAllFrames();
@@ -128,17 +183,26 @@ public class Practica8 extends javax.swing.JFrame {
 
     private void abrirActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_abrirActionPerformed
         // TODO add your handling code here:
+        
         int res = fc.showOpenDialog(null);
         if(res == JFileChooser.APPROVE_OPTION){
+            JInternalFrame[] vectorVentanas = escritorio.getAllFrames();
+            for(JInternalFrame ventana : vectorVentanas){
+                ventana.dispose();
+            }
             fichero = fc.getSelectedFile();
             System.out.println("Fichero: "+fichero.getAbsolutePath());
             VentanaInterna ventana = new VentanaInterna();
+            
             escritorio.add(ventana);
             ventana.setLocation(new Point(30,20));
             ventana.setVisible(true);
             try {
                 
                 ventana.lienzo1.setImagen(fichero.getAbsolutePath());
+                ventana.setSize(new Dimension(ventana.lienzo1.imageWidth(),ventana.lienzo1.imageHeight()));
+                
+                this.setBounds(20, 30,ventana.lienzo1.imageWidth()+50, ventana.lienzo1.imageHeight()+75);
                 repaint();
             } catch (IOException ex) {
                 Logger.getLogger(Practica8.class.getName()).log(Level.SEVERE, null, ex);
@@ -148,7 +212,46 @@ public class Practica8 extends javax.swing.JFrame {
             System.out.println("Cancelar");
         }
     }//GEN-LAST:event_abrirActionPerformed
+    
+    private Mat umbralizar(Mat imagen_original, Integer umbral) {
+        // crear dos imágenes en niveles de gris con el mismo
+        // tamaño que la original
+        Mat imagenGris = new Mat(imagen_original.rows(),
+        imagen_original.cols(),
+        CvType.CV_8U);
+        Mat imagenUmbralizada = new Mat(imagen_original.rows(),
+        imagen_original.cols(),
+        CvType.CV_8U);
+        // convierte a niveles de grises la imagen original
+        Imgproc.cvtColor(imagen_original,
+        imagenGris,
+        Imgproc.COLOR_BGR2GRAY);
+        // umbraliza la imagen:
+        // - píxeles con nivel de gris > umbral se ponen a 1
+        // - píxeles con nivel de gris <= umbra se ponen a 0
+        Imgproc.threshold(imagenGris,
+        imagenUmbralizada,
+        umbral,
+        255,
+        Imgproc.THRESH_BINARY);
+        // se devuelve la imagen umbralizada
+        return imagenUmbralizada;
 
+
+    }
+     
+    public boolean isNumeric(String n){
+        boolean res;
+         try {
+               Integer.parseInt(n);
+               res = true;
+           }catch(NumberFormatException excepcion){
+               res = false;
+
+           }
+         return res;
+    }
+    
     /**
      * @param args the command line arguments
      */
@@ -185,8 +288,8 @@ public class Practica8 extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JMenuItem Umbralizar;
     private javax.swing.JMenuItem abrir;
-    private javax.swing.JMenuItem abrirVentanaInterna;
     private javax.swing.JMenuItem cerrarVentana;
     private javax.swing.JDesktopPane escritorio;
     private javax.swing.JMenu jMenu1;

@@ -25,7 +25,17 @@ public class Lienzo extends JPanel{
         imagen = ImageIO.read(new File(path));
         
     }
+    public void setImagen(BufferedImage i){
+        imagen = i;
+    }
     
+    public int imageHeight(){
+        return imagen.getHeight();
+    }
+    
+    public int imageWidth(){
+        return imagen.getWidth();
+    }
     
     @Override
     public void paintComponent(Graphics g){

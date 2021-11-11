@@ -24,12 +24,12 @@
             <Property name="text" type="java.lang.String" value="Edici&#xf3;n"/>
           </Properties>
           <SubComponents>
-            <MenuItem class="javax.swing.JMenuItem" name="abrirVentanaInterna">
+            <MenuItem class="javax.swing.JMenuItem" name="Umbralizar">
               <Properties>
-                <Property name="text" type="java.lang.String" value="Abrir Ventana Interna"/>
+                <Property name="text" type="java.lang.String" value="Umbralizar"/>
               </Properties>
               <Events>
-                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="abrirVentanaInternaActionPerformed"/>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="UmbralizarActionPerformed"/>
               </Events>
             </MenuItem>
             <MenuItem class="javax.swing.JMenuItem" name="cerrarVentana">
