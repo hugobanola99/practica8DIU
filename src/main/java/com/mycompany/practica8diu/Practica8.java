@@ -193,7 +193,7 @@ public class Practica8 extends javax.swing.JFrame {
             fichero = fc.getSelectedFile();
             System.out.println("Fichero: "+fichero.getAbsolutePath());
             VentanaInterna ventana = new VentanaInterna();
-            
+            ventana.setTitle(fichero.getName());
             escritorio.add(ventana);
             ventana.setLocation(new Point(30,20));
             ventana.setVisible(true);
